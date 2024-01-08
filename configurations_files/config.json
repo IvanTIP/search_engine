@@ -5,8 +5,8 @@
       "version": "1.0"
    },
    "files": [
-      "..\\resources\\text1.txt",
-      "..\\resources\\text2.txt",
-      "..\\resources\\text3.txt"
+      "..\\..\\resources\\text1.txt",
+      "..\\..\\resources\\text2.txt",
+      "..\\..\\resources\\text3.txt"
    ]
 }
