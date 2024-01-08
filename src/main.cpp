@@ -12,7 +12,7 @@ void UpdateDocumentBase(InvertedIndex* ind, std::vector<std::string>& text){//о
 }
 
 void checkApp() {//проверка файла config.json
-    std::ifstream file("..\\configurations_files\\config.json");
+    std::ifstream file("..\\..\\configurations_files\\config.json");
     try {
         checkConfigException(file);
     }
@@ -45,7 +45,7 @@ void checkApp() {//проверка файла config.json
 }
 
 void checkVersionOfApplication() {//проверка версии приложения
-    std::ifstream CMakeListsFile("..\\CMakeLists.txt");
+    std::ifstream CMakeListsFile("..\\..\\CMakeLists.txt");
     if(!CMakeListsFile.is_open()) {
         std::cerr << "CMakeLists.txt file error" << std::endl;
         system("pause");
@@ -71,7 +71,7 @@ void checkVersionOfApplication() {//проверка версии приложе
         }
     }
     nlohmann::json dict;
-    std::ifstream configFile("..\\configurations_files\\config.json");
+    std::ifstream configFile("..\\..\\configurations_files\\config.json");
     if(!configFile.is_open()) {
         std::cerr << "config.json file error" << std::endl;
         system("pause");
