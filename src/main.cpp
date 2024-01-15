@@ -1,7 +1,11 @@
 #include <iostream>
 #include <thread>
 #include "convertorJSON.h"
-
+#include <QApplication>
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QListWidget>
+#include <QPlainTextEdit>
 
 void getTexts(ConverterJSON* converter, std::vector<std::string>& text) {//получение текста из текстовых файлов
     text = converter->GetTextDocuments();
@@ -86,28 +90,134 @@ void checkVersionOfApplication() {//проверка версии приложе
     }
 }
 
-int main(){
+int visualApp(int argc, char** argv, std::vector<std::vector<std::pair<int, float>>>& answers){
+    QApplication app(argc, argv);
+    std::ifstream configFile("..\\..\\configurations_files\\config.json");
+    nlohmann::json dict;
+    try {
+        checkConfigException(configFile);
+    }
+    catch(const std::exception& x) {
+        std::cerr << "Caught exception: " << x.what() << std::endl;//если файл не открылся, выбрасываем исключение "Config file is missing!"
+        system("pause");
+        exit(0);
+    }
+    configFile >> dict;
+    configFile.close();
 
+    auto* window = new QFrame;
+    auto* layout = new QVBoxLayout;
+    QStringList lst;
+    auto* lwg = new QListWidget;
+    auto* label = new QPlainTextEdit;
+
+    window->setLayout(layout);
+    window->setWindowTitle("Search engine");
+    layout->addWidget(lwg);
+    layout->addWidget(label);
+
+    lwg->setIconSize(QSize(48, 48));
+
+    for (auto &str: dict["files"]) {
+        std::string s = str.dump();
+        lst << s.c_str();
+    }
+    for (int i = 0; i < lst.size(); ++i) {
+        auto *pitem = new QListWidgetItem(lst[i], lwg);
+        pitem->setIcon(QPixmap("..\\..\\pictures\\text.png"));
+        lwg->insertItem(i, pitem);
+    }
+
+    QObject::connect(lwg, &QListWidget::itemClicked, [lwg, lst, answers, label]() {
+                         auto *currentFile = lwg->currentItem();
+                         QString pathCurrentFile = currentFile->text();
+                         QStringList outText;
+                         int textFilePos = 0;
+                         while (true) {
+                             if (lst[textFilePos] == pathCurrentFile) {
+                                 break;
+                             }
+                             ++textFilePos;
+                         }
+
+                         for (int i = 0; i < answers.size(); ++i) {
+                             std::string requestsNum = "request" + std::to_string(i + 1);//записываем номер запроса
+                             outText.push_back(requestsNum.c_str());
+                             if (answers[i].size() > 1) {
+                                 //если на один запрос нашлись ответы в нескольких документах
+                                 bool flag = false;
+                                 for (int j = 0; j < answers[i].size(); ++j) {
+                                     if (answers[i][j].second != 0.0f) {
+                                         if (answers[i][j].first == textFilePos) {
+                                             outText.push_back("    Condition: true");
+                                             std::string rank = std::to_string(answers[i][j].second);
+                                             outText.push_back("    Relevance: ");
+                                             outText.push_back(rank.c_str());
+                                             outText.push_back("\n");
+                                             flag = true;
+                                             break;
+                                         }
+                                     }
+                                 }
+                                 if(!flag){
+                                     outText.push_back("    Condition: false\n");
+                                 }
+                             } else if (answers[i].size() == 1) {  //если на один запрос ответ нашелся только в одном документе, выполняем это условие
+                                 bool flag = false;
+                                 if (answers[i][0].second != 0.0f) {//если запрос нашел ответ в каком-то документе, то переменная rank будет отлично от нуля, выполняем это условие
+                                     if (answers[i][0].first == textFilePos) {
+                                         outText.push_back("    Condition: true");
+                                         std::string rank = std::to_string(answers[i][0].second);
+                                         outText.push_back("    Relevance: ");
+                                         outText.push_back(rank.c_str());
+                                         outText.push_back("\n");
+                                         flag = true;
+                                     }
+                                 }
+                                 if(!flag) {
+                                     outText.push_back("    Condition: false\n");
+                                 }
+                             }
+
+                             QString s;
+                             for (auto &str: outText) {
+                                 s += str;
+                             }
+                             label->setPlainText(s);
+                         }
+                     }
+
+
+    );
+    window->resize(400, 600);
+    window->move(700, 200);
+    window->show();
+    return QApplication::exec();
+}
+
+int main(int argc, char** argv) {
     checkApp();//проверяем поля файла config.json и выводим сообщение о начале работы
     checkVersionOfApplication();//проверка версии приложения в CMakeList и в config.json
-    auto* converter = new ConverterJSON;
+    auto *converter = new ConverterJSON;
     std::vector<std::string> text;
     std::vector<std::string> requests;
     std::vector<std::vector<std::pair<int, float>>> answers;
-    auto* ind = new InvertedIndex;
+    auto *ind = new InvertedIndex;
     requests = converter->GetRequests();
     std::thread getTextsThread(getTexts, converter, std::ref(text));//поток для получения всех текстов из текстовых файлов
     std::thread updateDocsTread(UpdateDocumentBase, ind, std::ref(text));//поток для обновления базы документов
     std::this_thread::sleep_for(std::chrono::milliseconds(300));//останов основного потока на 300 миллисекунд перед проведением расчета
-    auto* server = new SearchServer(ind);
+    auto *server = new SearchServer(ind);
     calculateRelRelative(server, requests, answers);
     converter->putAnswers(answers);
     getTextsThread.join();
     updateDocsTread.join();
     delete converter;
     delete server;
+    visualApp(argc, argv, answers);//функция для визуализации приложения
     std::cout << "Exit from app" << std::endl;
     system("pause");
-
     return 0;
 }
+
+
