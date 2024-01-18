@@ -47,7 +47,7 @@ ConverterJSON::ConverterJSON() {
 }
 
 std::vector<std::string> ConverterJSON::GetTextDocuments() {
-    std::ifstream fileJSON("..\\..\\configurations_files\\config.json");
+    std::ifstream fileJSON("..\\..\\search_engine\\configurations_files\\config.json");
     try {
         checkConfigException(fileJSON);
     }
@@ -80,7 +80,7 @@ std::vector<std::string> ConverterJSON::GetTextDocuments() {
 }
 
 int ConverterJSON::GetResponsesLimit() {
-    std::ifstream file("..\\..\\configurations_files\\config.json");
+    std::ifstream file("..\\..\\search_engine\\configurations_files\\config.json");
     try {
         checkConfigException(file);
     }
@@ -100,7 +100,7 @@ int ConverterJSON::GetResponsesLimit() {
 }
 
 std::vector<std::string> ConverterJSON::GetRequests() {
-    std::ifstream file("..\\..\\configurations_files\\requests.json");
+    std::ifstream file("..\\..\\search_engine\\configurations_files\\requests.json");
     if (!file.is_open()) {
         std::cerr << "requests.json file error!" << std::endl;
         system("pause");
@@ -115,7 +115,7 @@ std::vector<std::string> ConverterJSON::GetRequests() {
 }
 
 void ConverterJSON::putAnswers(std::vector<std::vector<std::pair<int, float>>>& answers) {//записываем результат работы поискового движка
-    std::ofstream file("..\\..\\configurations_files\\answers.json");
+    std::ofstream file("..\\..\\search_engine\\configurations_files\\answers.json");
     if (!file.is_open()) {
         std::cerr << "answers.json file error!" << std::endl;
         system("pause");

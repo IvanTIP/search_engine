@@ -16,13 +16,12 @@ void UpdateDocumentBase(InvertedIndex* ind, std::vector<std::string>& text){//о
 }
 
 void checkApp() {//проверка файла config.json
-    std::ifstream file("..\\..\\configurations_files\\config.json");
+    std::ifstream file("..\\..\\search_engine\\configurations_files\\config.json");
     try {
         checkConfigException(file);
     }
     catch(const std::exception& x) {
         std::cerr << "Caught exception: " << x.what() << std::endl;//если файл не открылся, выбрасываем исключение "Config file is missing!"
-        system("pause");
         exit(0);
     }
     nlohmann::json dictConfig;
@@ -33,7 +32,6 @@ void checkApp() {//проверка файла config.json
     }
     catch(const std::exception& x) {
         std::cerr << "Caught exception: " << x.what() << std::endl;//если поле "config" отсутствует, выбрасываем исключение "Config file is empty!"
-        system("pause");
         exit(0);
     }
 
@@ -42,17 +40,15 @@ void checkApp() {//проверка файла config.json
     }
     catch(const std::exception& x) {
         std::cerr << "Caught exception: " << x.what() << std::endl;//если поле "files" отсутствует, выбрасываем исключение "File paths are missing or files do not exist!"
-        system("pause");
         exit(0);
     }
     std::cout << "Getting started with the app: " << dictConfig["config"]["name"] << std::endl;
 }
 
 void checkVersionOfApplication() {//проверка версии приложения
-    std::ifstream CMakeListsFile("..\\..\\CMakeLists.txt");
+    std::ifstream CMakeListsFile("..\\..\\search_engine\\CMakeLists.txt");
     if(!CMakeListsFile.is_open()) {
         std::cerr << "CMakeLists.txt file error" << std::endl;
-        system("pause");
         exit(0);
 
     }
@@ -75,31 +71,28 @@ void checkVersionOfApplication() {//проверка версии приложе
         }
     }
     nlohmann::json dict;
-    std::ifstream configFile("..\\..\\configurations_files\\config.json");
+    std::ifstream configFile("..\\..\\search_engine\\configurations_files\\config.json");
     if(!configFile.is_open()) {
         std::cerr << "config.json file error" << std::endl;
-        system("pause");
         exit(0);
     }
     configFile >> dict;
     configFile.close();
     if(version != dict["config"]["version"]) {//сравниваем версию в CMakeLists и в config.json
         std::cerr << "config.json has incorrect file" << std::endl;
-        system("pause");
         exit(0);
     }
 }
 
 int visualApp(int argc, char** argv, std::vector<std::vector<std::pair<int, float>>>& answers){
     QApplication app(argc, argv);
-    std::ifstream configFile("..\\..\\configurations_files\\config.json");
+    std::ifstream configFile("..\\..\\search_engine\\configurations_files\\config.json");
     nlohmann::json dict;
     try {
         checkConfigException(configFile);
     }
     catch(const std::exception& x) {
         std::cerr << "Caught exception: " << x.what() << std::endl;//если файл не открылся, выбрасываем исключение "Config file is missing!"
-        system("pause");
         exit(0);
     }
     configFile >> dict;
@@ -124,7 +117,7 @@ int visualApp(int argc, char** argv, std::vector<std::vector<std::pair<int, floa
     }
     for (int i = 0; i < lst.size(); ++i) {
         auto *pitem = new QListWidgetItem(lst[i], lwg);
-        pitem->setIcon(QPixmap("..\\..\\pictures\\text.png"));
+        pitem->setIcon(QPixmap("..\\..\\search_engine\\pictures\\text.png"));
         lwg->insertItem(i, pitem);
     }
 
@@ -187,7 +180,6 @@ int visualApp(int argc, char** argv, std::vector<std::vector<std::pair<int, floa
                          }
                      }
 
-
     );
     window->resize(400, 600);
     window->move(700, 200);
@@ -216,7 +208,6 @@ int main(int argc, char** argv) {
     delete server;
     visualApp(argc, argv, answers);//функция для визуализации приложения
     std::cout << "Exit from app" << std::endl;
-    system("pause");
     return 0;
 }
 
