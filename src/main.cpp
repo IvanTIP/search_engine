@@ -16,12 +16,12 @@ void UpdateDocumentBase(InvertedIndex* ind, std::vector<std::string>& text){//о
 }
 
 void checkApp() {//проверка файла config.json
-    std::ifstream file("..\\..\\search_engine\\configurations_files\\config.json");
+    std::ifstream file(":/config/configurations_files/config.json");
     try {
         checkConfigException(file);
     }
     catch(const std::exception& x) {
-        std::cerr << "Caught exception: " << x.what() << std::endl;//если файл не открылся, выбрасываем исключение "Config file is missing!"
+        std::cerr << "Caught exception555555555555555: " << x.what() << std::endl;//если файл не открылся, выбрасываем исключение "Config file is missing!"
         exit(0);
     }
     nlohmann::json dictConfig;

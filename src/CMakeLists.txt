@@ -14,6 +14,7 @@ set(PROJECT_SOURCES
         InvertedIndex.cpp
         convertorJSON.cpp
         SearchServer.cpp
+        ../res.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
